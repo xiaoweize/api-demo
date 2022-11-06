@@ -25,7 +25,7 @@ func init() {
 	}
 	//设置全局logger为debug级别输出到stderr
 	zap.DevelopmentSetup()
-	//host service的具体实现,初始化之前要加载全局配置，否则会panic   
+	//host service的具体实现,初始化之前要加载全局配置，否则会引发panic
 	service = impl.NewHostServiceImpl()
 }
 
@@ -33,6 +33,11 @@ func TestCreateHost(t *testing.T) {
 	should := assert.New(t)
 	ins := host.NewHost()
 	ins.Name = "test"
+	ins.Id = "001"
+	ins.Region = "cn-hangzhou"
+	ins.Type = "sm1"
+	ins.CPU = 2
+	ins.Memory = 2048
 	ins, err := service.CreateHost(context.Background(), ins)
 	if should.NoError(err) {
 		fmt.Println(ins)

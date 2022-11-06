@@ -10,16 +10,17 @@ import (
 //go对象与数据库之间的转换
 
 //将host.Host对象保存到mysql数据库
-func (i *HostServiceImpl) save(ctx context.Context, ins *host.Host) error {
+func (i *HostServiceImpl)  save(ctx context.Context, ins *host.Host) error {
+	var err error
 	// 把数据入库到 resource表和host表
-	// 一次需要往2个表录入数据, 我们需要2个操作 要么都成功，要么都失败,  事务的逻辑
+	// 一次需要往2个表录入数据, 我们需要2个操作要么都成功，要么都失败,事务的逻辑
 	tx, err := i.db.BeginTx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("start tx error %s", err)
 	}
-	//通过defer处理事物逻辑 
-	//1.无错误则Commit事物
-	//2.有报错则Rollback事物
+	//通过defer处理事物逻辑
+	//1.无错误则Commit事务
+	//2.有报错则Rollback事务
 	defer func() {
 		if err != nil {
 			if err = tx.Rollback(); err != nil {

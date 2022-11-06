@@ -11,10 +11,13 @@ import (
 func TestLoadConfigFromToml(t *testing.T) {
 	should := assert.New(t)
 	err := conf.LoadConfigFromToml("../etc/demo.toml")
-	//即使配置文件加载有问题也能得到默认配置
+	//即使配置文件加载失败也能得到默认配置
 	fmt.Println(conf.C().App.Host)
+	//此时conf.C().MySQL.GetDB()可以正常初始化全局db实例
+	fmt.Println(conf.C().MySQL.GetDB())
+
 	if should.NoError(err) {
-		should.Equal("api-demo", conf.C().MySQL.Database)
+		should.Equal("api_demo", conf.C().MySQL.Database)
 	}
 }
 

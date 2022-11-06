@@ -19,11 +19,12 @@ type HostServiceImpl struct {
 }
 
 //HostServiceImpl结构体实例构造函数
+//注意调用该函数之前，保证全局对象config已经初始化，否则会发生panic
 func NewHostServiceImpl() *HostServiceImpl {
 	return &HostServiceImpl{
-		//Host service 服务的日志Logger 用zap实现
+		//Host service 服务的子 Logger
 		l: zap.L().Named("Host"),
-		//获取sql.DB,注意在之前要加载全局配置
+		//未初始化全局config对象，会发生panic
 		db: conf.C().MySQL.GetDB(),
 	}
 }

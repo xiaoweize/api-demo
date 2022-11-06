@@ -22,7 +22,7 @@ const (
 		(?,?,?,?,?,?,?,?,?,?,?,?,?,?);
 	`
 	InsertDescribeSQL = `
-	INSERT INTO host ( reso urce_id, cpu, memory, gpu_amount, gpu_spec, os_type, os_name, serial_number )
+	INSERT INTO host ( resource_id, cpu, memory, gpu_amount, gpu_spec, os_type, os_name, serial_number )
 	VALUES
 		( ?,?,?,?,?,?,?,? );
 	`
