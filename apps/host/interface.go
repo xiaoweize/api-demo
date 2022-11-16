@@ -17,7 +17,7 @@ type Service interface {
 	//注意这里不要返回[]*Host,重新创建一个 HostSet 返回，保证了返回参数的一致性: 结构体指针
 	QueryHost(context.Context, *QueryHostRequest) (*HostSet, error)
 	//查询主机详情，返回给前端做主机 详情页
-	DescribeHost(context.Context, *QueryHostRequest) (*Host, error)
+	DescribeHost(context.Context, *DescribeHostRequest) (*Host, error)
 	//主机更新，返回更新后的主机信息给前端
 	UpdateHost(context.Context, *UpdateHostRequest) (*Host, error)
 	//删除主机也需要返回Host对象，前端用于展示当前删除的Host信息

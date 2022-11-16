@@ -1,0 +1,8 @@
+{
+    "type":"t5", 
+    "name":"test-put",
+    "cpu":2,
+    "memory":1024,
+    "region":"beijing234",
+    "os_name":"test"
+}

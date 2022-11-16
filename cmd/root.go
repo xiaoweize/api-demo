@@ -5,17 +5,28 @@ Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/xiaoweize/api-demo/version"
 )
+
+var vers bool
 
 var rootCmd = &cobra.Command{
 	Use:   "demo",
 	Short: "demo host-api",
 	Long:  `demo host-api impl`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return cmd.Usage()
+		if vers {
+			//打印版本信息
+			fmt.Println(version.FullVersion())
+		} else {
+			//打印帮助信息
+			return cmd.Usage()
+		}
+		return nil
 	},
 }
 
@@ -27,5 +38,5 @@ func Execute() {
 }
 
 func init() {
-
+	rootCmd.PersistentFlags().BoolVarP(&vers, "version", "v", false, "print version")
 }

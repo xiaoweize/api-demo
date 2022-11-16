@@ -1,6 +1,6 @@
 [app]
 name = "demo"
-# host = "0.0.0.0"
+host = "0.0.0.0"
 port = "8050"
 key  = "this is your app key"
 
@@ -12,7 +12,14 @@ password = "Password1"
 database = "api_demo"
 
 [log]
+# 支持的日志Level级别
+# DebugLevel: "debug" //常用于开发
+# InfoLevel:  "info" //debug日志就不会输出 常用于生产
+# WarnLevel:  "warning", //debug、info不会输出
+# ErrorLevel: "error", //debug、info、warning不会输出
+# FatalLevel: "fatal", //error以及上都不会输出
+# PanicLevel: "panic" //fatal以及以上都不会输出
 level = "debug"
-dir = "logs"
 format = "text"
 to = "stdout"
+# path_dir = "logs" //取消输出到文件
