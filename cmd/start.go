@@ -50,7 +50,7 @@ var startCmd = &cobra.Command{
 		//使用import _ "github.com/xiaoweize/api-demo/apps/all"来管理所有需要注册到Ioc容器层的服务
 		//import虽然完成了app的注册，但是还需要初始化
 		//如何执行HostService的config方法 apps.HostService是一个接口类型，需要将其断言成实例对象才能使用方法
-		//使用apps.Init()初始化所有注册到Ioc容器中的服务，其实就是调用服务中的Config方法来完成初始化 所以每个app模块对象要有Config方面来完成初始化
+		//使用apps.Init()初始化所有注册到Ioc容器中的服务，其实就是调用服务中的Config方法来完成初始化 所以每个app模块对象要有Config方法来完成初始化
 		apps.InitImpl()
 
 		// g := gin.Default()
@@ -75,46 +75,12 @@ var startCmd = &cobra.Command{
 		//注意9的信号压根收不到直接强制kill掉
 		signal.Notify(ch, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT)
 		go svc.WaitStop(ch)
+		//grpc在后台启动
+		go svc.grpc.Start()
 
-		return svc.http.Start()
+		return svc.Start()
 	},
 }
-
-//用于管理所有需要启动的服务
-//1.Http Service
-type manager struct {
-	http *protocol.HttpService
-	l    logger.Logger
-}
-
-func Newmanager() *manager {
-	return &manager{
-		protocol.NewHttpService(),
-		zap.L().Named("CLI"),
-	}
-}
-
-//这里开启所有服务
-func (m *manager) Start() error {
-	return m.http.Start()
-}
-
-//处理来自外部的终端信号
-//键盘Ctrl + C 会发送INT(2)信号量
-//键盘Ctrl + \会发送QUIT(3)信号量
-//kll PID命令会发送TERM(15)信号量给程序
-func (m *manager) WaitStop(ch <-chan os.Signal) {
-	for v := range ch {
-		switch v {
-		default:
-			m.l.Infof("received signal:%s", v)
-			m.http.Stop()
-		}
-	}
-}
-
-//用于管理程序所有需要启动的服务
-//1.http服务的启动
 
 //程序启动时需要关注如下问题
 // 1. http API, Grpc API 需要启动, 消息总线也需要监听, 比如负责注册与配置,  这些模块都是独立
@@ -126,6 +92,42 @@ func (m *manager) WaitStop(ch <-chan os.Signal) {
 //    3. 关闭数据库连接
 //    4. 如果使用了注册中心, 还要在注册中心完成注销操作
 //    5. 退出完毕
+//通过manage 用于管理所有需要启动的服务如http/grpc  位于跟目录下protocol目录 用于对外暴露的协议通常有http grpc
+type manager struct {
+	http *protocol.HttpService
+	grpc *protocol.GrpcService
+	l    logger.Logger
+}
+
+func Newmanager() *manager {
+	return &manager{
+		protocol.NewHttpService(),
+		protocol.NewGrpcService(),
+		zap.L().Named("CLI"),
+	}
+}
+
+func (m *manager) Start() error {
+	return m.http.Start()
+}
+
+//处理来自外部的终端信号
+//键盘Ctrl + C 会发送INT(2)信号量
+//键盘Ctrl + \会发送QUIT(3)信号量
+//kll PID命令会发送TERM(15)信号量给程序
+func (m *manager) WaitStop(ch <-chan os.Signal) {
+	for v := range ch {
+		//可以针对不同的信号量做处理，这里全部按关闭处理
+		switch v {
+		default:
+			m.l.Infof("received signal:%s", v)
+			//先关内部的grpc调用
+			m.grpc.Stop()
+			//再关外部的http
+			m.http.Stop()
+		}
+	}
+}
 
 //全局Logger对象初始化
 func loadGlobalLogger() error {

@@ -13,6 +13,13 @@ import (
 	"github.com/xiaoweize/api-demo/conf"
 )
 
+//http配置/启动/停止
+type HttpService struct {
+	server *http.Server
+	l      logger.Logger
+	r      gin.IRouter
+}
+
 func NewHttpService() *HttpService {
 	//new gin router 并没有加载handler
 	r := gin.Default()
@@ -38,12 +45,6 @@ func NewHttpService() *HttpService {
 
 }
 
-type HttpService struct {
-	server *http.Server
-	l      logger.Logger
-	r      gin.IRouter
-}
-
 //HTTP服务的启动
 func (s *HttpService) Start() error {
 	//加载Handler 把所有模块的Handler注册给gin router
@@ -52,6 +53,7 @@ func (s *HttpService) Start() error {
 	appNames := apps.LoadedGinApps()
 	s.l.Infof("loaded gin apps%v", appNames)
 
+	s.l.Infof("HTTP 服务监听地址: %s", conf.C().App.HttpAddr())
 	if err := s.server.ListenAndServe(); err != nil {
 		if err == http.ErrServerClosed {
 			//排除正常关闭的情况

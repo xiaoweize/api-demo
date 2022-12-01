@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
+	"google.golang.org/grpc"
 )
 
 //Ioc容器层 管理所有服务的实例 所有的依赖层
@@ -19,6 +20,7 @@ var (
 	//维护当前所有app模块名与接口映射
 	implApps = map[string]ImplService{}
 	ginApps  = map[string]GinService{}
+	grpcApps = map[string]GrpcService{}
 )
 
 //定义所有app模块接口 注意与host.ImplService的区别 后者是单个app模块的接口 前者是所有app模块的接口
@@ -42,6 +44,24 @@ func InitImpl() {
 	for _, v := range implApps {
 		v.Config()
 	}
+}
+
+//get的是一个impl的实例 从维护的map里面去拿
+//返回空接口，使用时由使用方进行断言
+func GetImpl(name string) any {
+	for k, v := range implApps {
+		if k == name {
+			return v
+		}
+	}
+	return nil
+}
+
+//注册由gin编写的handler
+type GinService interface {
+	Registry(r gin.IRouter)
+	Name() string
+	Config()
 }
 
 func RegistryGin(svc GinService) {
@@ -73,20 +93,39 @@ func LoadedGinApps() (names []string) {
 	return
 }
 
-//注册由gin编写的handler
-type GinService interface {
-	Registry(r gin.IRouter)
+//grpc service
+type GrpcService interface {
+	Registry(r *grpc.Server)
 	Name() string
 	Config()
 }
 
-//get的是一个impl的实例 从维护的map里面去拿
-//返回空接口，使用时由使用方进行断言
-func GetImpl(name string) any {
-	for k, v := range implApps {
-		if k == name {
-			return v
-		}
+//grpc service注册
+func RegistryGrpc(svc GrpcService) {
+	//将gin编写的模块接口注册到svcs的map中
+	if _, ok := grpcApps[svc.Name()]; ok {
+		//如果已经注册就panic
+		panic(fmt.Errorf("%s has registried!", svc.Name()))
 	}
-	return nil
+	grpcApps[svc.Name()] = svc
+}
+
+//grpc初始化
+func InitGrpc(g *grpc.Server) {
+	//先初始化好所有的对象
+	for _, v := range grpcApps {
+		v.Config()
+	}
+	//再完成grpc的注册
+	for _, v := range grpcApps {
+		v.Registry(g)
+	}
+}
+
+//获取已加载完成的grpc service
+func LoadedGrpcApps() (names []string) {
+	for k := range grpcApps {
+		names = append(names, k)
+	}
+	return
 }
