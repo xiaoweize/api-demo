@@ -18,6 +18,7 @@ var (
 )
 
 type HostServiceImpl struct {
+	//业务模块相关功能都放在这里如日志、数据库配置等
 	//Logger程序日志接口, 用于适配多种第三方日志插件
 	l  logger.Logger
 	db *sql.DB
