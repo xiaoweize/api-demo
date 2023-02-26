@@ -7,7 +7,7 @@ import (
 	"github.com/caarlos0/env/v6"
 )
 
-//如何把配置映射成config对象
+//将配置映射成config对象
 
 //从toml格式文件中加载配置
 func LoadConfigFromToml(filepath string) error {
@@ -22,7 +22,7 @@ func LoadConfigFromToml(filepath string) error {
 	return nil
 }
 
-//从环境变量加载配置
+//从环境变量中加载配置
 func LoadConfigFromEnv() error {
 	//初始化全局config实例,此时conf.C().MySQL.GetDB()可以正常初始化全局db实例
 	config = NewDefaultConfig()

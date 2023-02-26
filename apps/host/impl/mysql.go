@@ -18,7 +18,7 @@ var (
 )
 
 type HostServiceImpl struct {
-	//业务模块相关功能都放在这里如日志、数据库配置等
+	//业务模块相关功能都放在这里如日志、数据库
 	//Logger程序日志接口, 用于适配多种第三方日志插件
 	l  logger.Logger
 	db *sql.DB
@@ -28,7 +28,7 @@ type HostServiceImpl struct {
 //注意调用该函数之前，保证全局对象config已经初始化，否则会发生panic
 func NewHostServiceImpl() *HostServiceImpl {
 	return &HostServiceImpl{
-		//Host service 服务的子 Logger
+		//Host service 服务的子 Logger 命名为Host  未初始化配置logger将不会打印
 		l: zap.L().Named("Host"),
 		//未初始化全局config对象，会发生panic
 		db: conf.C().MySQL.GetDB(),

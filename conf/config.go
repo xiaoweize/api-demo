@@ -74,12 +74,12 @@ type MySQL struct {
 	//下面的参数是针对数据库连接的优化配置，通常不用配置，使用默认值就好
 	//控制当前mysql打开的最大连接数
 	MaxOpenConn int `toml:"max_open_conn"  env:"MYSQL_MAX_OPEN_CONN"`
-	//控制mysql复用，比如设置成5表示最多运行5个来复用
+	//允许的最大idle闲置连接数
 	MaxIdleConn int `toml:"max_idle_conn" env:"MYSQL_MAX_IDLE_CONN"`
 	//mysql连接的生命周期，与mysql配置相关，必须小于mysql的配置
-	//一个conn用12小时换一个conn，保证一定的可用性
+	//conn连接的最大生命周期 一个conn连接用了12小时后重新换一个连接，保证一定的可用性
 	MaxLifeTime int `toml:"max_life_time" env:"MYSQL_MAX_LIFE_TIME"`
-	//连接最多允许存活多久
+	//idle连接最多允许存活多久
 	MaxIdleTime int `toml:"max_idle_time" env:"MYSQL_MAX_idle_TIME"`
 	//作为私有变量，用于控制GetDB方法
 	lock sync.Mutex
